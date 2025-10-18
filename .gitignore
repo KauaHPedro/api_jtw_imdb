@@ -1,0 +1,36 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+ENV/
+
+# Arquivos do sistema
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+*.log
+.DS_Store
+
+# Cache e pastas temporárias
+*.egg-info/
+*.egg
+build/
+dist/
+.cache/
+.idea/
+.vscode/
+
+# Dados sensíveis
+.env
+.env.local
+.env.*
+!example.env
+
+# Dados do Kaggle / CSVs pesados
+app/data/*.csv
+!app/data/.keep
+
+# Arquivos temporários
+*.bak
+*.tmp
