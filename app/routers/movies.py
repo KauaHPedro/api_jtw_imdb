@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import Optional
 
@@ -12,17 +12,33 @@ router = APIRouter(prefix="/movies", tags=["Movies"])
 
 @router.get("/", response_model=PaginatedMovies)
 def list_movies(
-    q: Optional[str] = None,
-    pagination = Depends(pagination_params),
+    q: Optional[str] = Query(None, description="Busca parcial no título"),
+    director: Optional[str] = Query(None, description="Filtrar por nome do diretor"),
+    genre: Optional[str] = Query(None, description="Filtrar por gênero (ex: Drama)"),
+    released_year: Optional[int] = Query(None, description="Filtrar por ano de lançamento exato"),
+    pagination=Depends(pagination_params),
     db: Session = Depends(get_db),
-    user = Depends(get_current_user),
+    user=Depends(get_current_user),
 ):
     page = pagination["page"]; size = pagination["page_size"]
 
     query = db.query(Movie)
+
+    
     if q:
         like = f"%{q}%"
         query = query.filter(Movie.series_title.ilike(like))
+
+    if director:
+        like = f"%{director}%"
+        query = query.filter(Movie.director.ilike(like))
+
+    if genre:
+        like = f"%{genre}%"
+        query = query.filter(Movie.genre.ilike(like))
+
+    if released_year:
+        query = query.filter(Movie.released_year == released_year)
 
     total = query.count()
     items = query.order_by(Movie.id).offset((page - 1) * size).limit(size).all()
